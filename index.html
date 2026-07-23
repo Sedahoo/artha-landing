@@ -5,10 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Regal — Global equity tax compliance</title>
 <meta name="description" content="Regal turns a US parent's cap-table data into a CA-reviewable Indian equity-tax filing package — deterministic, cited, and audit-ready." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://sedahoo.github.io/regal-landing/" />
+<meta property="og:title" content="Regal — Global equity tax compliance" />
+<meta property="og:description" content="Cap table in, filing package out. Perquisite valuation, itemised TDS, challans and annexures — computed deterministically and held for your CA's approval." />
+<meta property="og:image" content="https://sedahoo.github.io/regal-landing/media/regal-film-poster.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#f7f6f2" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2319486a'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%23f5f6f8' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="preload" as="image" href="media/regal-film-poster.jpg" />
 <style>
   :root {
     --paper: #f7f6f2;
@@ -22,6 +30,8 @@
     --marine-deep: #123753;
     --navy: #0c2236;
     --navy-2: #0f2a42;
+    --room: #0a1723;          /* the screening room the film hangs in */
+    --room-2: #0d1e2d;
     --gold: #a9812f;
     --gold-soft: #c8a04f;
     --ok: #2e6b4f;
@@ -38,6 +48,7 @@
     font-size: 15px;
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
     overflow-x: hidden;
   }
   /* film grain over everything */
@@ -48,15 +59,19 @@
   }
   .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+  section[id] { scroll-margin-top: 72px; }
 
   ::selection { background: #dcd2b8; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 3px; }
 
   /* ── reveal on scroll ── */
   .reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s cubic-bezier(.2,.6,.2,1), transform .8s cubic-bezier(.2,.6,.2,1); }
   .reveal.in { opacity: 1; transform: none; }
   @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
     .reveal { opacity: 1; transform: none; transition: none; }
     .marquee-track { animation: none !important; }
+    .pulse { animation: none !important; }
   }
 
   /* ── nav ── */
@@ -64,8 +79,10 @@
     position: sticky; top: 0; z-index: 50;
     background: color-mix(in srgb, var(--paper) 86%, transparent);
     backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s, box-shadow .3s;
   }
+  nav.stuck { border-bottom-color: var(--line); box-shadow: 0 1px 20px -12px rgba(12,34,54,.5); }
   .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 62px; }
   .wordmark { font-family: var(--serif); font-size: 25px; color: var(--marine); text-decoration: none; letter-spacing: .01em; }
   .wordmark span { color: var(--gold); }
@@ -73,13 +90,14 @@
   .nav-links > a { color: var(--muted); text-decoration: none; font-size: 13.5px; transition: color .18s; }
   .nav-links > a:hover { color: var(--ink); }
   .nav-links > a.btn-primary, .nav-links > a.btn-primary:hover { color: #fff; }
-  @media (max-width: 720px) { .nav-links > a:not(.btn) { display: none; } }
+  @media (max-width: 760px) { .nav-links > a:not(.btn) { display: none; } }
 
   .btn {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 11px 24px; border-radius: 10px;
     font-size: 14px; font-weight: 500; text-decoration: none; line-height: 1.3;
-    transition: background .2s, border-color .2s, box-shadow .2s, transform .2s;
+    font-family: inherit; cursor: pointer;
+    transition: background .2s, border-color .2s, box-shadow .2s, transform .2s, color .2s;
   }
   .btn-primary {
     background: var(--marine); color: #fff; border: 1px solid var(--marine-deep);
@@ -110,8 +128,8 @@
   .eyebrow::after { background: linear-gradient(90deg, var(--gold-soft), transparent); }
   h1 {
     font-family: var(--serif); font-weight: 400;
-    font-size: clamp(44px, 7.2vw, 84px);
-    line-height: 1.02; letter-spacing: -.015em;
+    font-size: clamp(44px, 7vw, 80px);
+    line-height: 1.03; letter-spacing: -.018em;
     color: var(--marine-deep);
     max-width: 17ch; margin: 0 auto;
     text-wrap: balance;
@@ -119,73 +137,125 @@
   h1 em { font-style: italic; color: var(--marine); }
   h1 .goldword { font-style: italic; color: var(--gold); }
   .lede {
-    margin: 26px auto 34px; font-size: clamp(15.5px, 1.6vw, 17.5px); color: var(--muted);
-    max-width: 58ch; text-wrap: pretty;
+    margin: 28px auto 34px; font-size: clamp(15.5px, 1.5vw, 17px); color: var(--muted);
+    max-width: 56ch; line-height: 1.66; text-wrap: pretty;
   }
   .hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-  .hero-note { margin-top: 20px; font-size: 12px; color: var(--faint); }
+  .hero-note { margin-top: 22px; font-size: 12px; color: var(--faint); }
 
-  /* ── product mockup ── */
-  .stage { position: relative; margin: 72px auto 0; max-width: 1020px; padding: 0 28px; }
-  .stage::before {
-    content: ""; position: absolute; left: 10%; right: 10%; top: 12%; bottom: -4%;
-    background: radial-gradient(60% 70% at 50% 40%, rgba(25,72,106,.16), transparent 72%);
-    filter: blur(30px); z-index: -1;
+  /* ── the screening room ── */
+  .theatre {
+    position: relative; margin-top: 92px; padding: 0 0 74px; scroll-margin-top: 0;
+    background: linear-gradient(180deg, var(--room) 0%, var(--room-2) 100%);
+    border-top: 1px solid rgba(169,129,47,.42);
+    text-align: left; isolation: isolate;
   }
-  .window {
-    background: var(--surface); border: 1px solid var(--line-strong); border-radius: 16px;
-    box-shadow: 0 1px 2px rgba(23,34,43,.06), 0 24px 70px -18px rgba(12,34,54,.30), 0 60px 120px -40px rgba(12,34,54,.22);
-    overflow: hidden; text-align: left;
+  .theatre::before {                                    /* warm key light behind the screen */
+    content: ""; position: absolute; left: 50%; top: 60px; width: min(1240px, 98vw); height: 700px;
+    transform: translateX(-50%); pointer-events: none; z-index: -1;
+    background: radial-gradient(52% 50% at 50% 45%, rgba(169,129,47,.17), transparent 72%),
+                radial-gradient(70% 60% at 50% 62%, rgba(35,92,134,.18), transparent 74%);
+    filter: blur(20px);
   }
-  .titlebar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: #fbfaf7; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; background: #e2ded4; }
-  .titlebar .addr {
-    margin: 0 auto; font-family: var(--mono); font-size: 11px; color: var(--faint);
-    background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 3px 40px;
+  .theatre::after {                                     /* light spill along the proscenium edge */
+    content: ""; position: absolute; inset: 0 0 auto; height: 200px; pointer-events: none; z-index: -1;
+    background: linear-gradient(180deg, rgba(169,129,47,.13), transparent);
   }
-  .appbody { display: grid; grid-template-columns: 176px 1fr; min-height: 430px; }
-  @media (max-width: 760px) { .appbody { grid-template-columns: 1fr; } .sidebar { display: none; } }
-  .sidebar { border-right: 1px solid var(--line); padding: 18px 12px; background: #fbfaf7; }
-  .side-logo { font-family: var(--serif); font-size: 19px; color: var(--marine); padding: 0 10px 14px; }
-  .side-logo span { color: var(--gold); }
-  .sitem { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 7px; font-size: 12px; color: var(--muted); }
-  .sitem .ic { width: 13px; height: 13px; border: 1.4px solid currentColor; border-radius: 3.5px; opacity: .55; }
-  .sitem.on { background: #eef1ee; color: var(--ink); font-weight: 500; }
-  .sitem.on .ic { border-color: var(--marine); opacity: 1; }
-  .main { padding: 22px 26px; }
-  .crumb { font-size: 11px; color: var(--faint); margin-bottom: 6px; font-family: var(--mono); }
-  .mainhead { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
-  .mainhead h4 { font-family: var(--serif); font-weight: 400; font-size: 22px; color: var(--ink); }
-  .chip { font-size: 10.5px; font-weight: 600; letter-spacing: .06em; padding: 4px 10px; border-radius: 999px; }
-  .chip.ok { color: var(--ok); background: #e7f0ea; border: 1px solid #cfe0d5; }
-  .approve { font-size: 12px; font-weight: 600; color: #fff; background: var(--marine); border-radius: 8px; padding: 8px 16px; box-shadow: inset 0 1px 0 rgba(255,255,255,.15); }
-  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 620px) { .split { grid-template-columns: 1fr; } }
-  .pane { border: 1px solid var(--line); border-radius: 10px; background: #fdfcf9; }
-  .pane h5 { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); padding: 10px 14px; border-bottom: 1px solid var(--line); font-weight: 600; }
-  .prow { display: flex; justify-content: space-between; gap: 10px; padding: 8px 14px; font-size: 12px; border-bottom: 1px solid #f1efe8; color: var(--muted); }
-  .prow:last-child { border-bottom: none; }
-  .prow b { font-weight: 500; color: var(--ink); font-family: var(--mono); font-size: 11.5px; }
-  .prow.total { background: #f6f4ed; }
-  .prow.total b { color: var(--marine); font-weight: 600; }
-  .cite { font-size: 10px; color: var(--gold); font-family: var(--mono); }
+  .theatre-head {
+    position: relative; display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 24px; flex-wrap: wrap; padding-top: 78px; padding-bottom: 30px;
+  }
+  .theatre .sec-label { color: var(--gold-soft); margin-bottom: 12px; }
+  .theatre h2 { color: #eef3f7; margin-bottom: 0; font-size: clamp(28px, 3.6vw, 42px); }
+  .theatre h2 em { color: #cfe0ee; }
+  .theatre-meta { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: #6c8296; text-transform: uppercase; padding-bottom: 8px; }
 
-  .float-chip {
-    position: absolute; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 10px;
-    padding: 10px 16px; font-size: 12px; box-shadow: 0 12px 32px -8px rgba(12,34,54,.25);
-    display: flex; align-items: center; gap: 9px;
+  .console {
+    position: relative; border-radius: 14px; overflow: hidden;
+    background: #05090d; border: 1px solid rgba(255,255,255,.09);
+    box-shadow: 0 40px 100px -30px rgba(0,0,0,.85), 0 0 0 1px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
   }
-  .float-chip .mono { font-size: 11.5px; }
-  .fc1 { top: 46px; right: -6px; }
-  .fc2 { bottom: 44px; left: -10px; }
-  @media (max-width: 1100px) { .fc1 { right: 18px; } .fc2 { left: 18px; } }
-  @media (max-width: 760px) { .float-chip { display: none; } }
-  .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 rgba(46,107,79,.5); animation: pulse 2.4s infinite; }
-  @keyframes pulse { 70% { box-shadow: 0 0 0 9px rgba(46,107,79,0); } 100% { box-shadow: 0 0 0 0 rgba(46,107,79,0); } }
-  .gold-num { color: var(--gold); font-weight: 500; }
+  .screen { position: relative; aspect-ratio: 16 / 9; background: #05090d; display: block; }
+  .screen video { width: 100%; height: 100%; display: block; object-fit: cover; background: #05090d; }
+
+  .bigplay {
+    position: absolute; inset: 0; width: 100%; border: 0; cursor: pointer;
+    background: linear-gradient(180deg, rgba(5,9,13,.18) 0%, rgba(5,9,13,.10) 45%, rgba(5,9,13,.62) 100%);
+    display: grid; place-items: center; color: #fff; transition: opacity .35s;
+  }
+  .bigplay .ring {
+    width: 78px; height: 78px; border-radius: 50%;
+    background: rgba(10,23,35,.5); border: 1px solid rgba(255,255,255,.35);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: grid; place-items: center;
+    box-shadow: 0 16px 40px -12px rgba(0,0,0,.8);
+    transition: transform .28s cubic-bezier(.2,.7,.2,1), background .28s, border-color .28s;
+  }
+  .bigplay:hover .ring { transform: scale(1.07); background: rgba(169,129,47,.85); border-color: var(--gold-soft); }
+  .bigplay .cap { position: absolute; bottom: 26px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.72); }
+  .console.started .bigplay { opacity: 0; pointer-events: none; }
+
+  /* muted-autoplay affordance */
+  .soundcue {
+    position: absolute; right: 16px; top: 16px; z-index: 2;
+    display: none; align-items: center; gap: 8px; cursor: pointer;
+    padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.22);
+    background: rgba(6,14,22,.62); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    color: rgba(255,255,255,.85); font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+    transition: background .2s, border-color .2s;
+  }
+  .soundcue:hover { background: rgba(169,129,47,.8); border-color: var(--gold-soft); color: #fff; }
+  .console.started.silent .soundcue { display: inline-flex; }
+
+  .pbar { position: relative; height: 2px; background: rgba(255,255,255,.13); }
+  .pfill { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(90deg, var(--gold), var(--gold-soft)); }
+  .ptick { position: absolute; top: -1px; width: 1px; height: 4px; background: rgba(255,255,255,.28); }
+
+  .console-bar {
+    display: flex; align-items: center; gap: 14px; padding: 12px 16px;
+    background: #071019; border-top: 1px solid rgba(255,255,255,.05);
+  }
+  .cbtn {
+    width: 34px; height: 34px; flex: none; display: grid; place-items: center;
+    border-radius: 8px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04);
+    color: #cfdae4; cursor: pointer; transition: background .18s, color .18s, border-color .18s;
+  }
+  .cbtn:hover { background: rgba(255,255,255,.11); color: #fff; border-color: rgba(255,255,255,.24); }
+  .cbtn svg { width: 15px; height: 15px; }
+  .ctime { font-family: var(--mono); font-size: 11.5px; color: #7d93a6; font-variant-numeric: tabular-nums; }
+  .cspacer { flex: 1; }
+  .cnow { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  @media (max-width: 620px) { .cnow { display: none; } }
+
+  /* click surface: once the film is running, the frame itself is the play/pause control */
+  .tapzone { position: absolute; inset: 0; z-index: 1; border: 0; background: transparent; cursor: pointer; display: none; }
+  .console.started .tapzone { display: block; }
+
+  /* fullscreen: let the frame take the height it is given and letterbox inside it */
+  .console:fullscreen, .console:-webkit-full-screen { display: flex; flex-direction: column; border-radius: 0; border: 0; background: #000; }
+  .console:fullscreen .screen, .console:-webkit-full-screen .screen { flex: 1 1 auto; aspect-ratio: auto; min-height: 0; }
+  .console:fullscreen .screen video, .console:-webkit-full-screen .screen video { object-fit: contain; }
+
+  /* chapters — the film's acts, which are also the pipeline */
+  .chapters { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; margin-top: 22px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.08); border-radius: 10px; overflow: hidden; }
+  @media (max-width: 860px) { .chapters { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 480px) { .chapters { grid-template-columns: repeat(2, 1fr); } }
+  .chap {
+    background: var(--room); border: 0; cursor: pointer; text-align: left;
+    padding: 13px 15px 15px; font-family: inherit; transition: background .2s;
+  }
+  .chap:hover { background: #12283a; }
+  .chap .ct { display: block; font-family: var(--mono); font-size: 10.5px; color: #6c8296; letter-spacing: .06em; }
+  .chap .cl { display: block; font-size: 12.5px; color: #a9bccb; margin-top: 3px; transition: color .2s; }
+  .chap.on { background: #13293b; box-shadow: inset 0 2px 0 var(--gold); }
+  .chap.on .ct { color: var(--gold-soft); }
+  .chap.on .cl { color: #eef3f7; }
+
+  .theatre-foot { margin-top: 22px; font-size: 12.5px; color: #7d93a6; max-width: 74ch; line-height: 1.7; }
+  .theatre-foot b { color: #b9c9d6; font-weight: 500; }
 
   /* ── marquee ── */
-  .marquee { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface); margin-top: 84px; overflow: hidden; }
+  .marquee { border-bottom: 1px solid var(--line); background: var(--surface); overflow: hidden; }
   .marquee-track { display: flex; width: max-content; animation: scroll 36s linear infinite; }
   .marquee:hover .marquee-track { animation-play-state: paused; }
   .mq { display: flex; align-items: center; gap: 12px; padding: 15px 30px; font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; color: var(--muted); white-space: nowrap; }
@@ -195,9 +265,9 @@
   /* ── sections ── */
   section { padding: 104px 0; }
   .sec-label { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); font-weight: 600; display: block; margin-bottom: 16px; }
-  h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(32px, 4.2vw, 50px); color: var(--marine-deep); line-height: 1.1; letter-spacing: -.01em; margin-bottom: 16px; text-wrap: balance; }
+  h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(32px, 4.2vw, 50px); color: var(--marine-deep); line-height: 1.1; letter-spacing: -.012em; margin-bottom: 16px; text-wrap: balance; }
   h2 em { font-style: italic; color: var(--marine); }
-  .sub { color: var(--muted); max-width: 60ch; margin-bottom: 56px; font-size: 15.5px; text-wrap: pretty; }
+  .sub { color: var(--muted); max-width: 60ch; margin-bottom: 56px; font-size: 15.5px; line-height: 1.68; text-wrap: pretty; }
 
   /* pipeline rail */
   .rail { display: flex; align-items: flex-start; gap: 0; margin-bottom: 64px; overflow-x: auto; padding-bottom: 8px; }
@@ -239,11 +309,13 @@
   .ledger-head .s { font-size: 10.5px; color: var(--faint); font-family: var(--mono); }
   .ledger table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .ledger td { padding: 10px 22px; border-bottom: 1px solid #f1efe8; color: var(--muted); }
-  .ledger td.num { text-align: right; color: var(--ink); font-family: var(--mono); font-size: 12.5px; }
+  .ledger td.num { text-align: right; color: var(--ink); font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
   .ledger tr.total td { border-bottom: none; background: #f6f4ed; color: var(--ink); font-weight: 600; padding: 13px 22px; }
   .ledger tr.total td.num { color: var(--marine); font-size: 14px; }
   .ledger-foot { padding: 12px 22px; background: #fbfaf7; border-top: 1px solid var(--line); font-size: 11px; color: var(--faint); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
   .pass { color: var(--ok); font-weight: 600; }
+  .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 rgba(46,107,79,.5); animation: pulse 2.4s infinite; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 9px rgba(46,107,79,0); } 100% { box-shadow: 0 0 0 0 rgba(46,107,79,0); } }
 
   /* ── bento ── */
   .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; }
@@ -318,10 +390,11 @@
 </head>
 <body>
 
-<nav>
+<nav id="nav">
   <div class="wrap nav-inner">
     <a class="wordmark" href="#">Regal<span>.</span></a>
     <div class="nav-links">
+      <a href="#film">The film</a>
       <a href="#how">How it works</a>
       <a href="#package">The package</a>
       <a href="#trust">Why it's safe</a>
@@ -333,68 +406,85 @@
 <header class="hero">
   <div class="hero-bg"></div>
   <div class="wrap">
-    <span class="eyebrow reveal">Stripe Tax for global equity</span>
+    <span class="eyebrow reveal">US parent · Indian subsidiary</span>
     <h1 class="reveal">When your Indian team exercises options, the filing is <span class="goldword">already written.</span></h1>
     <p class="lede reveal">
-      Regal turns a US parent's cap-table data into a complete, CA-reviewable Indian equity-tax
-      filing package — perquisite valuation, itemised TDS, challans and annexures — computed
-      deterministically and cited to statute.
+      Regal turns a US parent's cap-table data into a complete Indian equity-tax filing package:
+      perquisite valuation, itemised TDS, challans and annexures. Every figure is computed
+      deterministically, cited to statute, and held for your CA's approval.
     </p>
     <div class="hero-ctas reveal">
       <a class="btn btn-primary" href="https://regal-demo.regal-demo.workers.dev" data-demo-link>Launch the live demo <span class="arr">→</span></a>
       <a class="btn btn-ghost" href="mailto:gajerajenik7@gmail.com?subject=Regal%20walkthrough">Book a walkthrough</a>
     </div>
-    <p class="hero-note reveal">US parent → Indian subsidiary · Regal generates filings for human review and is never the filer of record.</p>
+    <p class="hero-note reveal">Regal prepares filings for professional review. It is never the filer of record.</p>
   </div>
 
-  <div class="stage reveal">
-    <div class="float-chip fc1"><span class="pulse"></span> Validation cascade <b class="mono" style="color:var(--ok)">27/27 passed</b></div>
-    <div class="float-chip fc2">TDS to deposit <b class="mono gold-num">₹1,03,584</b></div>
-    <div class="window">
-      <div class="titlebar">
-        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-        <span class="addr">regal — event review</span>
+  <!-- ── the film ── -->
+  <div class="theatre" id="film">
+    <div class="wrap">
+      <div class="theatre-head reveal">
+        <div>
+          <span class="sec-label">The film</span>
+          <h2>Ninety seconds, <em>cap table to challan.</em></h2>
+        </div>
+        <span class="theatre-meta">01:30 · no narration</span>
       </div>
-      <div class="appbody">
-        <aside class="sidebar">
-          <div class="side-logo">Regal<span>.</span></div>
-          <div class="sitem"><span class="ic"></span>Dashboard</div>
-          <div class="sitem"><span class="ic"></span>Cap table</div>
-          <div class="sitem on"><span class="ic"></span>Events</div>
-          <div class="sitem"><span class="ic"></span>Import</div>
-          <div class="sitem"><span class="ic"></span>Filings</div>
-          <div class="sitem"><span class="ic"></span>Calendar</div>
-          <div class="sitem"><span class="ic"></span>Settings</div>
-        </aside>
-        <div class="main">
-          <div class="crumb">events / marcus-almeida / nso-exercise</div>
-          <div class="mainhead">
-            <h4>Marcus Almeida — NSO exercise, 1,000 shares</h4>
-            <div style="display:flex;gap:10px;align-items:center">
-              <span class="chip ok">VALIDATED</span>
-              <span class="approve">Approve &amp; Export</span>
-            </div>
-          </div>
-          <div class="split">
-            <div class="pane">
-              <h5>Evidence</h5>
-              <div class="prow"><span>FMV certificate — merchant banker</span><b>$4.50</b></div>
-              <div class="prow"><span>Strike price — Carta grant OPT-2</span><b>$0.50</b></div>
-              <div class="prow"><span>FX — RBI reference, exercise date</span><b>₹83.0000</b></div>
-              <div class="prow"><span>Rule pack</span><b class="cite">v2026-04 · IT Act 2025</b></div>
-              <div class="prow"><span>Rule 3(8) window</span><b style="color:var(--ok)">14 of 180 days</b></div>
-            </div>
-            <div class="pane">
-              <h5>Computed output</h5>
-              <div class="prow"><span>Spread</span><b>$4,000.00</b></div>
-              <div class="prow"><span>Perquisite — s.17(2)(vi)</span><b>₹3,32,000</b></div>
-              <div class="prow"><span>TDS base @ 30%</span><b>₹99,600</b></div>
-              <div class="prow"><span>Health &amp; education cess @ 4%</span><b>₹3,984</b></div>
-              <div class="prow total"><span>Challan ITNS-281</span><b>₹1,03,584</b></div>
-            </div>
-          </div>
+
+      <div class="console reveal" id="console" tabindex="0"
+           aria-label="Regal product film player. Space to play or pause, arrow keys to seek, M to mute, F for full screen.">
+        <div class="screen">
+          <video id="film-video"
+                 poster="media/regal-film-poster.jpg"
+                 muted loop playsinline preload="none"
+                 aria-label="Regal product film: a cap-table export becomes a reviewed Indian equity-tax filing package."
+                 data-hd="media/regal-film-1080.mp4"
+                 data-sd="media/regal-film-720.mp4"></video>
+          <button class="soundcue" id="soundcue" type="button">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+            Sound off — click for audio
+          </button>
+          <button class="bigplay" id="bigplay" type="button" aria-label="Play the film with sound">
+            <span class="ring">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+            </span>
+            <span class="cap">Play with sound</span>
+          </button>
+          <button class="tapzone" id="tapzone" type="button" aria-label="Play or pause"></button>
+        </div>
+
+        <div class="pbar" id="pbar" aria-hidden="true"><div class="pfill" id="pfill"></div></div>
+
+        <div class="console-bar">
+          <button class="cbtn" id="playpause" type="button" aria-label="Play">
+            <svg id="ic-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+          </button>
+          <button class="cbtn" id="mute" type="button" aria-label="Unmute">
+            <svg id="ic-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
+          </button>
+          <span class="ctime"><span id="tnow">0:00</span> / 1:30</span>
+          <span class="cspacer"></span>
+          <span class="cnow" id="cnow">Opening</span>
+          <button class="cbtn" id="full" type="button" aria-label="Full screen">
+            <svg id="ic-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+          </button>
         </div>
       </div>
+
+      <div class="chapters reveal" id="chapters" role="group" aria-label="Chapters">
+        <button class="chap" type="button" data-t="0"><span class="ct">0:00</span><span class="cl">Opening</span></button>
+        <button class="chap" type="button" data-t="5"><span class="ct">0:05</span><span class="cl">The workspace</span></button>
+        <button class="chap" type="button" data-t="15"><span class="ct">0:15</span><span class="cl">How it's done today</span></button>
+        <button class="chap" type="button" data-t="25"><span class="ct">0:25</span><span class="cl">Evidence to filing</span></button>
+        <button class="chap" type="button" data-t="55"><span class="ct">0:55</span><span class="cl">What ships</span></button>
+        <button class="chap" type="button" data-t="75"><span class="ct">1:15</span><span class="cl">Sign-off</span></button>
+      </div>
+
+      <p class="theatre-foot reveal">
+        Recorded from the running application, not a mockup. Every figure on screen is the demo
+        tenant's showcase case: <b>1,000 NSOs at a $0.50 strike, FMV $4.50, RBI rate ₹83.0000
+        → TDS ₹1,03,584</b>. Sign in to the demo and you will see the same numbers.
+      </p>
     </div>
   </div>
 
@@ -419,8 +509,8 @@
     <span class="sec-label reveal">The pipeline</span>
     <h2 class="reveal">Cap table in. <em>Filing package out.</em></h2>
     <p class="sub reveal">
-      One pipeline from the exercise record to the reviewed export — every step evidenced,
-      every value traceable to its source document, rate, and rule version.
+      One path from the exercise record to the reviewed export. Every step is evidenced, and every
+      value traces back to the document, rate and rule version it came from.
     </p>
 
     <div class="rail reveal">
@@ -436,24 +526,24 @@
     <div class="grid3">
       <div class="col reveal">
         <span class="num">01</span>
-        <h3>Source documents, bound immutably</h3>
-        <p>Exercise records from your Carta export, the merchant-banker FMV certificate, and the official
-        RBI reference rate for the exact exercise date — snapshotted once and locked to the calculation
-        forever. No market-rate fallbacks, no silent substitutions.</p>
+        <h3>Source documents, bound to the calculation</h3>
+        <p>The exercise record from your Carta export, the merchant-banker FMV certificate, and the
+        official RBI reference rate for the exact exercise date. Each is snapshotted at ingest and
+        locked to the calculation permanently. No market-rate fallbacks, no silent substitutions.</p>
       </div>
       <div class="col reveal">
         <span class="num">02</span>
         <h3>Deterministic to the paisa</h3>
-        <p>Spread → perquisite under Section 17(2)(vi) → itemised TDS with surcharge, cess, interest and
-        penalty. Pure decimal arithmetic against date-versioned rule packs that cite the statute — the
-        same inputs produce the same rupee, every time.</p>
+        <p>Spread becomes perquisite under Section 17(2)(vi), then itemised TDS with surcharge, cess,
+        interest and penalty. The arithmetic is pure decimal, run against date-versioned rule packs
+        that cite the statute. The same inputs return the same rupee every time.</p>
       </div>
       <div class="col reveal">
         <span class="num">03</span>
-        <h3>A CA signs off, side by side</h3>
-        <p>The review screen puts evidence on the left and output on the right: certificate page, FX
-        snapshot, and citations beside the full breakup and rendered forms. One explicit
-        Approve &amp; Export action — nothing leaves without it.</p>
+        <h3>Your CA signs off, side by side</h3>
+        <p>The review screen sets evidence against output: certificate page, FX snapshot and citations
+        on the left, the full breakup and rendered forms on the right. One explicit Approve &amp; Export
+        action releases the package, and nothing leaves without it.</p>
       </div>
     </div>
   </div>
@@ -465,15 +555,15 @@
       <span class="sec-label reveal">The liability firewall</span>
       <h2 class="reveal">Every number is checked <em>twice, by strangers.</em></h2>
       <p class="sub reveal">
-        Before anything can be approved, an independent verifier — deliberately sharing no code with the
-        calculation engine — recomputes every value printed on every form. A single mismatch locks the
-        package and disables approval until it's resolved.
+        Before a package can be approved, an independent verifier recomputes every value printed on
+        every form. It deliberately shares no code with the calculation engine. A single mismatch
+        locks the package and disables approval until it is resolved.
       </p>
       <ul class="checklist reveal">
         <li><strong>Every monetary value</strong> re-derived from the source evidence, not the form.</li>
-        <li><strong>FX date</strong> must equal the exercise date — exact match, no nearest-day.</li>
+        <li><strong>FX date</strong> must equal the exercise date. Exact match, no nearest-day.</li>
         <li><strong>FMV certificate window</strong> checked against Rule 3(8)'s 180-day limit.</li>
-        <li><strong>Breakups must sum</strong> — base, surcharge, cess, interest, penalty, to the paisa.</li>
+        <li><strong>Breakups must sum</strong>: base, surcharge, cess, interest, penalty, to the paisa.</li>
       </ul>
     </div>
     <div class="ledger reveal" aria-label="Sample calculation">
@@ -501,15 +591,15 @@
   <div class="wrap">
     <span class="sec-label reveal">The deliverable</span>
     <h2 class="reveal">Everything the filing needs, <em>in one export.</em></h2>
-    <p class="sub reveal">Each approved package ships as a ZIP with the PDFs, a machine-readable values sidecar, and a full audit manifest.</p>
+    <p class="sub reveal">Each approved package ships as a ZIP: the PDFs, a machine-readable values sidecar, and a full audit manifest.</p>
 
     <div class="bento">
       <div class="bcell b3 reveal">
         <span class="tag">FORMS</span>
         <h3>The complete Indian filing set</h3>
-        <p>Challan values formatted exactly as the e-Pay Tax portal expects, with the 1961→2025 IT Act
-        transition handled by rule-pack date branching. Quarterly return data fed by the CIN receipt you
-        attach after deposit.</p>
+        <p>Challan values formatted exactly as the e-Pay Tax portal expects, with the 1961 to 2025 IT Act
+        transition handled by rule-pack date branching. Quarterly return data is fed by the CIN receipt
+        you attach after deposit.</p>
         <div class="formrow">
           <span class="formpill">ITNS-281 / 281N</span>
           <span class="formpill">24Q + Annexure-II</span>
@@ -520,26 +610,26 @@
       <div class="bcell b3 reveal">
         <span class="tag">US SIDE</span>
         <h3>Form 3921, automatically</h3>
-        <p>ISO exercises generate the parent's IRS Form 3921 alongside the Indian package — one event,
+        <p>ISO exercises generate the parent's IRS Form 3921 alongside the Indian package. One event,
         both jurisdictions, no second workflow.</p>
         <div class="formrow"><span class="formpill">Form 3921</span><span class="formpill">ISO only</span></div>
       </div>
       <div class="bcell b2 reveal">
         <span class="tag">FEMA</span>
         <h3>Flags, not surprises</h3>
-        <p>OPI reporting, LRS limits, ~90-day repatriation and Schedule FA exposure — flagged per event
+        <p>OPI reporting, LRS limits, ~90-day repatriation and Schedule FA exposure, flagged per event
         and tracked on a compliance calendar.</p>
       </div>
       <div class="bcell b2 reveal">
         <span class="tag">CAP TABLE</span>
         <h3>Reconciled at the source</h3>
-        <p>Share classes, option pools, grants and vesting — so every exercise event reconciles against
+        <p>Share classes, option pools, grants and vesting, so every exercise event reconciles against
         the ledger it came from.</p>
       </div>
       <div class="bcell b2 reveal">
         <span class="tag">AUDIT</span>
         <h3>Append-only history</h3>
-        <p>Who uploaded, confirmed, calculated and approved what — and when. Approvals freeze their
+        <p>Who uploaded, confirmed, calculated and approved what, and when. Approvals freeze their
         inputs permanently.</p>
       </div>
     </div>
@@ -550,7 +640,7 @@
   <div class="wrap">
     <span class="sec-label reveal">Architecture</span>
     <h2 class="reveal">Built like the liability depends on it. <em>Because it does.</em></h2>
-    <p class="sub reveal">Getting withholding wrong costs interest, penalties, and audits. Regal's architecture treats every rupee as a legal claim.</p>
+    <p class="sub reveal">Getting withholding wrong costs interest, penalties and audits. Regal's architecture treats every rupee as a legal claim.</p>
 
     <div class="stats reveal">
       <div class="stat"><div class="v">27<i>/27</i></div><div class="k">independent recompute checks on every package</div></div>
@@ -564,20 +654,20 @@
         <span class="tag">CASCADE</span>
         <h3>The validation cascade</h3>
         <p>An independent verifier recomputes every printed value from raw evidence. One mismatch locks
-        the package — approval is disabled, not discouraged.</p>
+        the package: approval is disabled, not discouraged.</p>
       </div>
       <div class="tcard reveal">
         <span class="tag">DETERMINISM</span>
         <h3>AI in exactly one place</h3>
-        <p>AI reads one thing: the FMV certificate PDF — and its extraction is shown beside the source
-        page for human confirmation. Everything touching money or law is hard-coded, versioned,
+        <p>AI reads one thing, the FMV certificate PDF, and its extraction is shown beside the source
+        page for a human to confirm. Everything touching money or law is hard-coded, versioned and
         deterministic.</p>
       </div>
       <div class="tcard reveal">
         <span class="tag">CONTROL</span>
         <h3>You stay the filer of record</h3>
-        <p>Regal generates; it never files. Every package requires an explicit human Approve &amp; Export by
-        your CA or admin, and the export tells you exactly what to pay, where, and by when.</p>
+        <p>Regal generates; it never files. Every package requires an explicit human Approve &amp; Export
+        by your CA or admin, and the export states exactly what to pay, where, and by when.</p>
       </div>
     </div>
   </div>
@@ -590,14 +680,14 @@
         <span class="sec-label">Live demo</span>
         <h2>See a real package <em>come together.</em></h2>
         <p>
-          The live demo is pre-loaded with a fictional company — Northwind Labs India — and three equity
-          events mid-flight: one awaiting an FMV certificate, one awaiting human confirmation, and one
-          fully validated package waiting for the CA's approval. Sign in and approve it yourself.
+          The demo tenant is pre-loaded with three equity events mid-flight: one waiting on an FMV
+          certificate, one waiting on human confirmation, and one fully validated package waiting for
+          the CA's approval. Sign in and approve it yourself.
         </p>
         <a class="btn btn-gold" href="https://regal-demo.regal-demo.workers.dev" data-demo-link>Open the live demo <span class="arr">→</span></a>
       </div>
       <div class="cred">
-        <div class="row"><span class="k">Sign in as</span><span class="v">ca@northwind.example</span></div>
+        <div class="row"><span class="k">Sign in as</span><span class="v">ca@demo.example</span></div>
         <div class="row"><span class="k">Password</span><span class="v">regal-demo</span></div>
         <div class="row"><span class="k">Role</span><span class="v">Reviewing CA</span></div>
         <div class="row"><span class="k">Data</span><span class="v">fictional · resets periodically</span></div>
@@ -627,6 +717,154 @@
     el.style.transitionDelay = `${Math.min((i % 4) * 70, 210)}ms`;
     io.observe(el);
   });
+
+  // nav gains a rule once the page has moved
+  const nav = document.getElementById("nav");
+  const onScroll = () => nav.classList.toggle("stuck", window.scrollY > 12);
+  addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  // ── the film ──────────────────────────────────────────────────────────────
+  (() => {
+    const box   = document.getElementById("console");
+    const v     = document.getElementById("film-video");
+    const chaps = [...document.querySelectorAll(".chap")];
+    const pfill = document.getElementById("pfill");
+    const pbar  = document.getElementById("pbar");
+    const tnow  = document.getElementById("tnow");
+    const cnow  = document.getElementById("cnow");
+    const icPlay  = document.getElementById("ic-play");
+    const icSound = document.getElementById("ic-sound");
+    const icFull  = document.getElementById("ic-full");
+    const btnPlay = document.getElementById("playpause");
+    const btnMute = document.getElementById("mute");
+    const btnFull = document.getElementById("full");
+    const DUR = 90;
+
+    const PATH = { play: "M8 5.5v13l11-6.5z", pause: "M7 5h3.4v14H7zM13.6 5H17v14h-3.4z" };
+    const SOUND = {
+      on:  ["M11 5 6 9H2v6h4l5 4V5z", "M15.5 8.5a5 5 0 0 1 0 7", "M18.5 5.5a9 9 0 0 1 0 13"],
+      off: ["M11 5 6 9H2v6h4l5 4V5z", "m16 9 5 6", "M21 9l-5 6"],
+    };
+    const FULL = { enter: "M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5", exit: "M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" };
+
+    // chapter ticks on the progress hairline
+    for (const c of chaps) {
+      const tick = document.createElement("span");
+      tick.className = "ptick";
+      tick.style.left = (c.dataset.t / DUR) * 100 + "%";
+      pbar.appendChild(tick);
+    }
+
+    // Pick a rendition once, on first need — the poster carries the page until then.
+    let loaded = false;
+    const load = () => {
+      if (loaded) return;
+      loaded = true;
+      const conn = navigator.connection || {};
+      const wantSD = conn.saveData || innerWidth < 900 || /2g|3g/.test(conn.effectiveType || "");
+      v.src = wantSD ? v.dataset.sd : v.dataset.hd;
+    };
+
+    const started = () => box.classList.contains("started");
+    const start = () => { box.classList.add("started"); };
+
+    const setIcons = () => {
+      icPlay.firstElementChild.setAttribute("d", v.paused ? PATH.play : PATH.pause);
+      btnPlay.setAttribute("aria-label", v.paused ? "Play" : "Pause");
+      const muted = v.muted || v.volume === 0;
+      icSound.innerHTML = (muted ? SOUND.off : SOUND.on).map((d) => `<path d="${d}"/>`).join("");
+      btnMute.setAttribute("aria-label", muted ? "Unmute" : "Mute");
+      box.classList.toggle("silent", muted && !v.paused);
+    };
+
+    const play = () => { load(); const p = v.play(); if (p) p.then(start).catch(() => {}); };
+
+    const withSound = () => {
+      load(); v.muted = false; v.volume = 1;
+      const p = v.play(); if (p) p.then(() => { start(); setIcons(); }).catch(() => {});
+    };
+
+    const toggle = () => { v.paused ? play() : v.pause(); setIcons(); };
+
+    document.getElementById("bigplay").addEventListener("click", withSound);
+    document.getElementById("soundcue").addEventListener("click", (e) => { e.stopPropagation(); withSound(); });
+    document.getElementById("tapzone").addEventListener("click", toggle);
+
+    btnPlay.addEventListener("click", toggle);
+    btnMute.addEventListener("click", () => { v.muted = !v.muted; if (!v.muted) load(); setIcons(); });
+
+    // Full screen is a toggle. The same button has to bring you back out of it.
+    const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement;
+    const setFullIcon = () => {
+      const on = fsElement() === box;
+      icFull.firstElementChild.setAttribute("d", on ? FULL.exit : FULL.enter);
+      btnFull.setAttribute("aria-label", on ? "Exit full screen" : "Full screen");
+    };
+    const toggleFull = () => {
+      if (fsElement()) {
+        (document.exitFullscreen || document.webkitExitFullscreen || (() => {})).call(document);
+      } else {
+        load();
+        (box.requestFullscreen || box.webkitRequestFullscreen || (() => {})).call(box);
+      }
+    };
+    btnFull.addEventListener("click", toggleFull);
+    for (const ev of ["fullscreenchange", "webkitfullscreenchange"]) document.addEventListener(ev, setFullIcon);
+
+    // Keyboard, once the player has focus — clicking the frame gives it focus.
+    box.addEventListener("keydown", (e) => {
+      if (e.target.closest("button") && (e.key === " " || e.key === "Enter")) return; // let the button act
+      const seek = (d) => { load(); v.currentTime = Math.max(0, Math.min(v.duration || DUR, v.currentTime + d)); };
+      switch (e.key) {
+        case " ": case "k": case "K": toggle(); break;
+        case "ArrowRight": seek(5); break;
+        case "ArrowLeft": seek(-5); break;
+        case "m": case "M": v.muted = !v.muted; if (!v.muted) load(); setIcons(); break;
+        case "f": case "F": toggleFull(); break;
+        default: return;
+      }
+      e.preventDefault();   // stop space from scrolling the page out from under the film
+    });
+
+    for (const c of chaps) c.addEventListener("click", () => {
+      load();
+      const seek = () => { v.currentTime = +c.dataset.t; };
+      v.readyState ? seek() : v.addEventListener("loadedmetadata", seek, { once: true });
+      play();
+    });
+
+    v.addEventListener("play", () => { start(); setIcons(); });
+    v.addEventListener("pause", setIcons);
+    v.addEventListener("volumechange", setIcons);
+    v.addEventListener("timeupdate", () => {
+      const t = v.currentTime;
+      pfill.style.width = (t / (v.duration || DUR)) * 100 + "%";
+      tnow.textContent = `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+      let active = chaps[0];
+      for (const c of chaps) if (t >= +c.dataset.t) active = c;
+      if (!active.classList.contains("on")) {
+        for (const c of chaps) c.classList.toggle("on", c === active);
+        cnow.textContent = active.querySelector(".cl").textContent;
+      }
+    });
+
+    // Autoplay muted when the screen is in view — never on small screens, a metered
+    // connection, or for readers who asked for less motion.
+    const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const conn = navigator.connection || {};
+    if (!calm && innerWidth >= 900 && !conn.saveData) {
+      const filmIO = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && v.paused && !started()) play();
+          else if (!e.isIntersecting && !v.paused && v.muted) v.pause();
+        }
+      }, { threshold: 0.45 });
+      filmIO.observe(box);
+    }
+
+    setIcons();
+  })();
 </script>
 
 </body>

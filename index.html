@@ -161,14 +161,10 @@
     content: ""; position: absolute; inset: 0 0 auto; height: 200px; pointer-events: none; z-index: -1;
     background: linear-gradient(180deg, rgba(169,129,47,.13), transparent);
   }
-  .theatre-head {
-    position: relative; display: flex; align-items: flex-end; justify-content: space-between;
-    gap: 24px; flex-wrap: wrap; padding-top: 78px; padding-bottom: 30px;
-  }
+  .theatre-head { position: relative; padding: 78px 0 30px; }
   .theatre .sec-label { color: var(--gold-soft); margin-bottom: 12px; }
   .theatre h2 { color: #eef3f7; margin-bottom: 0; font-size: clamp(28px, 3.6vw, 42px); }
   .theatre h2 em { color: #cfe0ee; }
-  .theatre-meta { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: #6c8296; text-transform: uppercase; padding-bottom: 8px; }
 
   .console {
     position: relative; border-radius: 14px; overflow: hidden;
@@ -424,11 +420,8 @@
   <div class="theatre" id="film">
     <div class="wrap">
       <div class="theatre-head reveal">
-        <div>
-          <span class="sec-label">The film</span>
-          <h2>Ninety seconds, <em>cap table to challan.</em></h2>
-        </div>
-        <span class="theatre-meta">01:30 · no narration</span>
+        <span class="sec-label">The film</span>
+        <h2>Ninety seconds, <em>cap table to challan.</em></h2>
       </div>
 
       <div class="console reveal" id="console" tabindex="0"

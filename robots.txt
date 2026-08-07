@@ -1,0 +1,8 @@
+# artha.cc — everything here is public marketing copy, so nothing is disallowed.
+# The one thing this file has to do is name the sitemap: crawlers look for it
+# here before they look anywhere else.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://artha.cc/sitemap.xml

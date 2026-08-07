@@ -24,7 +24,39 @@
     <link rel="preload" as="font" type="font/ttf" href="/fonts/Geist-SemiBold.ttf" crossorigin />
     <link rel="preload" as="font" type="font/ttf" href="/fonts/Geist-Regular.ttf" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/OrticaLinear-Regular.woff2" crossorigin />
-    <script type="module" crossorigin src="/assets/main-PnW-UgdL.js"></script>
+
+    <!--
+      Who "Artha" is, in the form Google reads directly rather than infers. On a
+      new domain sharing its name with a Sanskrit word, a yoga studio and a
+      consultancy, the sameAs profiles are the useful part: they are what ties
+      this site to the accounts under the same name.
+
+      Every claim here is checkable. Nothing about size, funding or founding
+      date, because none of that is established anywhere Google could confirm
+      it, and invented structured data is worse than none.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Artha",
+        "url": "https://artha.cc/",
+        "logo": "https://artha.cc/brand/artha-icon.svg",
+        "email": "contact@artha.cc",
+        "description": "Artha turns a US parent's cap-table data into a CA-reviewable Indian equity-tax filing package — deterministic, cited, and audit-ready.",
+        "sameAs": [
+          "https://x.com/arthacc_",
+          "https://www.linkedin.com/company/arthacc"
+        ],
+        "founder": [
+          { "@type": "Person", "name": "Aman Dihora" },
+          { "@type": "Person", "name": "Dhruv Jadwani" },
+          { "@type": "Person", "name": "Jenik Gajera" },
+          { "@type": "Person", "name": "Pearl Mendapara" }
+        ]
+      }
+    </script>
+    <script type="module" crossorigin src="/assets/main-DkVSlr9m.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/main-CoYvuZXg.css">
   </head>
   <body>

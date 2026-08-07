@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The three real pages, in the trailing-slash form GitHub Pages actually serves
+  with a 200. Listing "/about" instead would point Google at a URL that answers
+  301, which makes it resolve a redirect before it can index anything.
+
+  lastmod is maintained by hand. It is a hint, not a promise — but a date that
+  never changes is worse than none, so update it when a page's copy changes, or
+  drop the element entirely if that stops happening.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://artha.cc/</loc>
+    <lastmod>2026-08-07</lastmod>
+  </url>
+  <url>
+    <loc>https://artha.cc/about/</loc>
+    <lastmod>2026-08-07</lastmod>
+  </url>
+  <url>
+    <loc>https://artha.cc/book/</loc>
+    <lastmod>2026-08-07</lastmod>
+  </url>
+</urlset>

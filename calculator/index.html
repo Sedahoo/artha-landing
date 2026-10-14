@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Artha — ESOP Filing Calculator</title>
+<meta name="description" content="See the filing package an ESOP exercise produces: perquisite value, TDS estimate, and every form it lands in. Prepared by Artha for review by a qualified professional." />
+<style>
+  :root {
+    --ink: #1a1f2b;
+    --paper: #f7f6f2;
+    --card: #ffffff;
+    --accent: #1f5f4f;
+    --accent-soft: #e6efe9;
+    --line: #d9d6cc;
+    --muted: #6b7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 17px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 20px 60px; }
+  header { border-bottom: 2px solid var(--ink); padding: 18px 0 14px; margin-bottom: 28px; }
+  .brand { font-family: Arial, Helvetica, sans-serif; font-weight: 700; letter-spacing: 2px; font-size: 13px; text-transform: uppercase; color: var(--accent); }
+  h1 { font-size: 34px; line-height: 1.15; margin-top: 10px; }
+  .sub { margin-top: 10px; color: var(--muted); font-size: 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 22px; margin-bottom: 20px; }
+  h2 { font-family: Arial, Helvetica, sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 14px; }
+  .path-toggle { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .path-btn {
+    font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 600;
+    padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line);
+    background: var(--paper); cursor: pointer; color: var(--ink);
+  }
+  .path-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  label { display: block; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); margin: 14px 0 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  input[type=number], select {
+    width: 100%; padding: 12px 14px; font-size: 17px; font-family: inherit;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink);
+  }
+  input:focus, select:focus { outline: 2px solid var(--accent); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+  @media (max-width: 560px) { .grid2 { grid-template-columns: 1fr; } }
+  .results { margin-top: 6px; }
+  .big { font-size: 30px; font-weight: 700; margin: 4px 0 2px; }
+  .lbl { font-family: Arial, Helvetica, sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); gap: 12px; }
+  .row:last-child { border-bottom: none; }
+  .row .k { color: var(--muted); }
+  .row .v { font-weight: 700; text-align: right; white-space: nowrap; }
+  table.forms { width: 100%; border-collapse: collapse; font-size: 15px; }
+  table.forms th {
+    font-family: Arial, Helvetica, sans-serif; font-size: 12px; text-transform: uppercase;
+    letter-spacing: 1px; text-align: left; color: var(--muted); padding: 8px 8px;
+    border-bottom: 2px solid var(--ink);
+  }
+  table.forms td { padding: 12px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .form-name { font-weight: 700; white-space: nowrap; }
+  .deadline { font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: var(--accent); white-space: nowrap; padding-top: 2px; }
+  .note { background: var(--accent-soft); border-left: 4px solid var(--accent); padding: 14px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 15px; }
+  footer { margin-top: 30px; padding-top: 18px; border-top: 2px solid var(--ink); font-size: 14px; color: var(--muted); }
+  .cta { display: inline-block; margin-top: 14px; background: var(--accent); color: #fff; font-family: Arial, Helvetica, sans-serif; font-weight: 700; font-size: 15px; padding: 14px 26px; border-radius: 8px; text-decoration: none; }
+  .estimate-tag { font-family: Arial, Helvetica, sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; background: var(--line); color: var(--ink); border-radius: 4px; padding: 2px 8px; margin-left: 8px; vertical-align: middle; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">Artha</div>
+    <h1>The ESOP filing calculator</h1>
+    <p class="sub">Enter one exercise. See the entire filing package it produces — every form, every deadline, one page.</p>
+  </header>
+
+  <div class="card">
+    <h2>Scenario</h2>
+    <div class="path-toggle">
+      <button class="path-btn active" id="btn-exercise" onclick="setPath('exercise')">Employee exercised options</button>
+      <button class="path-btn" id="btn-buyback" onclick="setPath('buyback')">Company bought back shares</button>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <label for="employees">Employees exercising</label>
+        <input type="number" id="employees" value="40" min="1" oninput="calc()" />
+      </div>
+      <div>
+        <label for="shares">Shares per employee</label>
+        <input type="number" id="shares" value="2000" min="1" oninput="calc()" />
+      </div>
+      <div>
+        <label for="strike">Strike price (₹ / share)</label>
+        <input type="number" id="strike" value="85" min="0" step="0.01" oninput="calc()" />
+      </div>
+      <div>
+        <label for="fmv">FMV on exercise date (₹ / share)</label>
+        <input type="number" id="fmv" value="640" min="0" step="0.01" oninput="calc()" />
+      </div>
+      <div>
+        <label for="salary">Avg annual salary + perquisite base (₹)</label>
+        <input type="number" id="salary" value="3000000" min="0" step="10000" oninput="calc()" />
+      </div>
+      <div>
+        <label for="regime">Tax regime</label>
+        <select id="regime" onchange="calc()">
+          <option value="new">New regime, FY 2026-27</option>
+          <option value="old">Old regime (slab rates)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Per employee <span class="estimate-tag">Estimate</span></h2>
+    <div class="results">
+      <div class="lbl">Perquisite value (FMV − strike × shares)</div>
+      <div class="big" id="perq">—</div>
+      <div class="row"><span class="k">Marginal TDS the employer must deduct</span><span class="v" id="tds">—</span></div>
+      <div class="row"><span class="k">Take-home left from exercise (before cess)</span><span class="v" id="net">—</span></div>
+      <div class="row"><span class="k">Advance tax instalment it lands in</span><span class="v" id="inst">—</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Company-wide totals <span class="estimate-tag">Estimate</span></h2>
+    <div class="row"><span class="k">Total perquisite across employees</span><span class="v" id="tot-perq">—</span></div>
+    <div class="row"><span class="k">Total TDS to deduct and deposit</span><span class="v" id="tot-tds">—</span></div>
+    <div class="row"><span class="k">Forms 16 to issue</span><span class="v" id="tot-16">—</span></div>
+  </div>
+
+  <div class="card">
+    <h2>The filing package</h2>
+    <table class="forms" id="forms-table">
+      <tr><th>Form</th><th>What it carries</th><th>Deadline</th></tr>
+    </table>
+    <div class="note" id="path-note"></div>
+  </div>
+
+  <div class="note">
+    Estimates use slab math for illustration. The exact TDS run needs each employee's full salary structure, surcharge and cess. Artha prepares the complete package from your real cap table and payroll data — a qualified professional reviews every figure before anything is filed. This page is not tax advice.
+  </div>
+
+  <footer>
+    Rule pack version: FY 2026-27, new-regime slabs, ESOP perquisite under section 17(2)(viia), TDS under section 192. Buyback treatment reflects the post-October 2024 deemed-dividend framework.
+    <br /><br />
+    Artha — the compliance infrastructure for global equity. https://artha.cc
+  </footer>
+</div>
+
+<script>
+function fmt(n) {
+  if (!isFinite(n)) return "—";
+  return "₹ " + Math.round(n).toLocaleString("en-IN");
+}
+function setPath(p) {
+  document.getElementById("btn-exercise").classList.toggle("active", p === "exercise");
+  document.getElementById("btn-buyback").classList.toggle("active", p === "buyback");
+  calc();
+}
+function slabTaxNew(income) {
+  const slabs = [[400000, 0], [800000, .05], [1200000, .10], [1600000, .15], [2000000, .20], [2400000, .25]];
+  let tax = 0, prev = 0;
+  for (const [cap, rate] of slabs) {
+    if (income > prev) tax += (Math.min(income, cap) - prev) * rate;
+    prev = cap;
+  }
+  if (income > 2400000) tax += (income - 2400000) * 0.30;
+  return tax;
+}
+function slabTaxOld(income) {
+  const slabs = [[250000, 0], [500000, .05], [1000000, .20]];
+  let tax = 0, prev = 0;
+  for (const [cap, rate] of slabs) {
+    if (income > prev) tax += (Math.min(income, cap) - prev) * rate;
+    prev = cap;
+  }
+  if (income > 1000000) tax += (income - 1000000) * 0.30;
+  return tax;
+}
+function taxOf(income) {
+  const regime = document.getElementById("regime").value;
+  return regime === "new" ? slabTaxNew(income) : slabTaxOld(income);
+}
+const FORMS_EXERCISE = [
+  ["Form 24Q", "Quarterly salary TDS return, perquisite reported as salary income", "Q1: 31 Jul · Q2: 31 Oct · Q3: 31 Jan · Q4: 31 May"],
+  ["Form 12BA", "Per-employee statement of perquisites", "With each Form 16"],
+  ["Form 16", "Employee's salary and TDS certificate", "By 15 June after the FY"],
+  ["ITR-2 (working file)", "Employee return: perquisite in salary, gains in Schedule CG", "31 Jul (non-audit)"],
+  ["Schedule FA", "Foreign-asset disclosure for US parent shares", "With the ITR-2"],
+  ["Form 67", "Foreign tax credit relief under the DTAA", "With the ITR-2"]
+];
+const FORMS_BUYBACK = [
+  ["Deemed-dividend working", "Buyback consideration taxed at slab (post Oct 2024 framework)", "Same FY"],
+  ["Form 24Q / TDS", "Withholding on buyback payout where structured as salary", "Quarterly, as above"],
+  ["ITR-2 (working file)", "Employee return: buyback income and any capital gains", "31 Jul (non-audit)"],
+  ["Schedule FA", "Foreign-asset disclosure for US parent shares", "With the ITR-2"],
+  ["Form 67", "Foreign tax credit relief under the DTAA", "With the ITR-2"]
+];
+function calc() {
+  const emp = +document.getElementById("employees").value || 0;
+  const shares = +document.getElementById("shares").value || 0;
+  const strike = +document.getElementById("strike").value || 0;
+  const fmv = +document.getElementById("fmv").value || 0;
+  const salary = +document.getElementById("salary").value || 0;
+  const buyback = document.getElementById("btn-buyback").classList.contains("active");
+  const perq = Math.max(0, (fmv - strike)) * shares;
+  const marginal = Math.max(0, taxOf(salary + perq) - taxOf(salary));
+  document.getElementById("perq").textContent = fmt(perq);
+  document.getElementById("tds").textContent = fmt(marginal);
+  document.getElementById("net").textContent = fmt(perq - marginal);
+  document.getElementById("tot-perq").textContent = fmt(perq * emp);
+  document.getElementById("tot-tds").textContent = fmt(marginal * emp);
+  document.getElementById("tot-16").textContent = String(emp);
+  const now = new Date().getMonth();
+  const inst = now < 5 ? "15 Jun (15%)" : now < 8 ? "15 Sep (45%)" : now < 11 ? "15 Dec (75%)" : "15 Mar (100%)";
+  document.getElementById("inst").textContent = inst;
+  const table = document.getElementById("forms-table");
+  table.innerHTML = "<tr><th>Form</th><th>What it carries</th><th>Deadline</th></tr>" +
+    (buyback ? FORMS_BUYBACK : FORMS_EXERCISE)
+      .map(r => `<tr><td class="form-name">${r[0]}</td><td>${r[1]}</td><td class="deadline">${r[2]}</td></tr>`).join("");
+  document.getElementById("path-note").textContent = buyback
+    ? "Buyback treatment depends on structure: an option cash-out can be a salary perquisite, a deemed dividend under the post-October 2024 framework, or capital gains on surrender. The calculator shows the salary-side estimate; the qualified professional reviewing your package fixes the treatment per case before anything is filed."
+    : "At exercise, the FMV gap is a perquisite under section 17(2)(viia). The employer deducts TDS under section 192 and reports it in 24Q. Eligible startups may allow the employee to defer the TDS until sale or exit under section 192(1C); the deferral tracking sheet is part of the package when it applies.";
+}
+calc();
+</script>
+</body>
+</html>
